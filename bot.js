@@ -55,21 +55,6 @@ const IDLE_TIMEOUT = 300000; // 5 minutes of inactivity before leaving
 const MAX_RETRIES = 2; // Max retries for failed playback
 const PORT = 5000; // Express server port
 
-// Initialize play-dl to avoid YouTube rate limits
-(async () => {
-  try {
-    // This helps avoid 429 errors from YouTube
-    await play.getFreeClientID().then((clientID) => play.setToken({
-      youtube: {
-        client_id: clientID
-      }
-    }));
-    console.log('✅ YouTube client initialized');
-  } catch (error) {
-    console.log('⚠️ Could not initialize YouTube client, continuing anyway');
-  }
-})();
-
 // Initialize Discord client
 const client = new Client({
   intents: [
