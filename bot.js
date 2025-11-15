@@ -53,7 +53,7 @@ const express = require('express');
 const PREFIX = '%';
 const IDLE_TIMEOUT = 300000; // 5 minutes of inactivity before leaving
 const MAX_RETRIES = 2; // Max retries for failed playback
-const PORT = 5000; // Express server port
+const PORT = 3000; // Express server port
 
 // Initialize Discord client
 const client = new Client({
