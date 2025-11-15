@@ -1,0 +1,25 @@
+{
+  "name": "discord-music-bot",
+  "version": "1.0.0",
+  "description": "A fully-featured Discord music bot with YouTube playback",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "keywords": [
+    "discord",
+    "music",
+    "bot",
+    "youtube"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/voice": "^0.17.0",
+    "discord.js": "^14.14.1",
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "opusscript": "^0.1.1",
+    "play-dl": "^1.9.7"
+  }
+}
