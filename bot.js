@@ -55,6 +55,21 @@ const IDLE_TIMEOUT = 300000; // 5 minutes of inactivity before leaving
 const MAX_RETRIES = 2; // Max retries for failed playback
 const PORT = 5000; // Express server port
 
+// Initialize play-dl to avoid YouTube rate limits
+(async () => {
+  try {
+    // This helps avoid 429 errors from YouTube
+    await play.getFreeClientID().then((clientID) => play.setToken({
+      youtube: {
+        client_id: clientID
+      }
+    }));
+    console.log('✅ YouTube client initialized');
+  } catch (error) {
+    console.log('⚠️ Could not initialize YouTube client, continuing anyway');
+  }
+})();
+
 // Initialize Discord client
 const client = new Client({
   intents: [
@@ -270,6 +285,12 @@ async function searchYouTube(query) {
     };
   } catch (error) {
     console.error('YouTube search error:', error);
+    
+    // Check for rate limiting (429 error)
+    if (error.message && error.message.includes('429')) {
+      console.error('⚠️ YouTube rate limit hit! Consider using YouTube cookies for authentication.');
+    }
+    
     return null;
   }
 }
