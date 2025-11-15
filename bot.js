@@ -22,6 +22,14 @@ const {
 
 const play = require("play-dl");
 
+// ---- Add this ----
+if (process.env.YT_COOKIES) {
+  play.setCookie(process.env.YT_COOKIES);
+  console.log('✅ YouTube cookies loaded');
+}
+// -----------------
+
+
 // --------------------- RENDER 429 BYPASS ---------------------
 play.setToken({
   youtube: {
