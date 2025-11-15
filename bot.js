@@ -53,7 +53,7 @@ const express = require('express');
 const PREFIX = '%';
 const IDLE_TIMEOUT = 300000; // 5 minutes of inactivity before leaving
 const MAX_RETRIES = 2; // Max retries for failed playback
-const PORT = 3000; // Express server port
+const PORT = 5000; // Express server port
 
 // Initialize Discord client
 const client = new Client({
@@ -182,14 +182,20 @@ async function playNextTrack(guildId) {
   
   try {
     // Get audio stream from YouTube
+    console.log(`[Playback] Fetching stream for: ${track.title}`);
     const stream = await play.stream(track.url);
+    
+    console.log(`[Playback] Stream type: ${stream.type}`);
     const resource = createAudioResource(stream.stream, {
       inputType: stream.type,
       inlineVolume: true
     });
     
     // Play the track
+    console.log(`[Playback] Starting playback...`);
     queue.player.play(resource);
+    
+    console.log(`[Playback] Player status: ${queue.player.state.status}`);
     
     // Send "Now Playing" embed
     if (queue.textChannel) {
@@ -371,6 +377,7 @@ async function commandPlay(message, args) {
     
     // Handle player events
     queue.player.on(AudioPlayerStatus.Idle, () => {
+      console.log(`[Player] Went idle, loop mode: ${queue.loopMode}`);
       if (queue.loopMode !== LoopMode.TRACK) {
         playNextTrack(guildId);
       } else {
@@ -379,8 +386,14 @@ async function commandPlay(message, args) {
     });
     
     queue.player.on('error', error => {
-      console.error('Audio player error:', error);
+      console.error('❌ [Audio Player Error]:', error);
+      console.error('Error details:', error.message);
+      console.error('Error resource:', error.resource?.metadata);
       playNextTrack(guildId);
+    });
+    
+    queue.player.on('stateChange', (oldState, newState) => {
+      console.log(`[Player] State: ${oldState.status} -> ${newState.status}`);
     });
   }
   
@@ -798,13 +811,23 @@ async function commandSetActivity(message, args) {
 }
 
 // Bot ready event
-client.on('ready', () => {
+client.on('ready', async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
   console.log(`🎵 Music bot is ready!`);
   console.log(`📝 Serving ${client.guilds.cache.size} guilds`);
   
   // Set default activity
   client.user.setActivity('music | %help', { type: ActivityType.Listening });
+  
+  // Verify play-dl is ready
+  try {
+    console.log('🔧 Initializing YouTube streaming...');
+    // Test play-dl setup
+    const testSearch = await play.search('test', { limit: 1 });
+    console.log('✅ YouTube streaming ready!');
+  } catch (error) {
+    console.error('⚠️ Warning: YouTube streaming may have issues:', error.message);
+  }
 });
 
 // Message handler
